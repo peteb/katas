@@ -1,0 +1,9 @@
+2013 w52: Redis pubsub
+======================
+Workers generate pdfs in result directory using user data.
+Workers run as daemons. Server can be blocking cli.
+
+Tech
+----
+C (Server), Ruby (Workers), CMake, Redis, pdflatex (Generating PDF)
+XXXX (Testing server - worker integration)
