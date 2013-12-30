@@ -9,7 +9,11 @@ require 'redis'
 #   name
 #   city
 #   body
+#   path - path to generated document, set by worker
 #
+# Published messages
+# ------------------
+# job_finished - id of job generated
 
 def collectJob(redis, job_id) 
   fields = {}
@@ -20,6 +24,12 @@ def collectJob(redis, job_id)
   fields
 end
 
+# Returns fs path to generated file
+def generateMail(job)
+
+end
+
+
 redis = Redis.new
 
 loop do
@@ -27,5 +37,9 @@ loop do
   
   if redis.exists("job:#{job_id}")
     job = collectJob(redis, job_id)
+    p job
+    pdf_path = generateMail(job)
+    redis.hset("job:#{job_id}", 'path', pdf_path)
+    redis.publish('job_finished', job_id)
   end
 end
