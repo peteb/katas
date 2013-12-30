@@ -8,3 +8,18 @@ Tech
 ----
 C (Server), Ruby (Workers), CMake, Redis, LaTeX/pdflatex (Generating PDF)
 XXXX (Testing server - worker integration)
+
+How to run
+----------
+First start redis; redis-server.
+
+./worker.rb
+or
+god -c worker.god -D
+
+cmake .
+./RedisMailGenerator
+
+Notes
+-----
+PDF generating hasn't been implemented yet.
