@@ -13,7 +13,7 @@ typedef struct {
 static void read_input(char *output, char *data, size_t n) {
    printf("%s", output);
 
-   char *buf;
+   char *buf = 0;
    size_t linecap = 0;
    if (!getline(&buf, &linecap, stdin)) {
       exit(0);
