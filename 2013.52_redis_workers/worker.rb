@@ -16,12 +16,9 @@ require 'redis'
 # job_finished - id of job generated
 
 def collectJob(redis, job_id) 
-  fields = {}
-  # TODO: prettify
-  fields['name'] = redis.hget("job:#{job_id}", 'name')
-  fields['city'] = redis.hget("job:#{job_id}", 'city')
-  fields['body'] = redis.hget("job:#{job_id}", 'body')
-  fields
+  Hash[['name', 'city', 'body'].map do |field|
+    [field, redis.hget("job:#{job_id}", field)]
+  end]
 end
 
 # Returns fs path to generated file
