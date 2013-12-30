@@ -20,6 +20,8 @@ static void readInput(char *output, char *data, size_t n) {
    }
 
    strncpy(data, buf, n);
+   free(buf);
+   
    size_t len = strlen(data);
    if (data[len - 1] == '\n') {
       data[len - 1] = '\0';
