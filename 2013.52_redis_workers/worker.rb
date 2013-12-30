@@ -15,7 +15,7 @@ require 'redis'
 # ------------------
 # job_finished - id of job generated
 
-def collectJob(redis, job_id) 
+def createJobHash(redis, job_id) 
   Hash[['name', 'city', 'body'].map do |field|
     [field, redis.hget("job:#{job_id}", field)]
   end]
@@ -33,7 +33,7 @@ loop do
   job_id = redis.blpop('jobs')[1]
   
   if redis.exists("job:#{job_id}")
-    job = collectJob(redis, job_id)
+    job = createJobHash(redis, job_id)
     p job
     pdf_path = generateMail(job)
     redis.hset("job:#{job_id}", 'path', pdf_path)
