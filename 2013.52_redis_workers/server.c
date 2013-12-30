@@ -48,7 +48,8 @@ static long long createJob(redisContext *context, job_t *job) {
    setKeyField(context, job_id, "city", job->city);
    setKeyField(context, job_id, "body", job->body);
    redisReply *reply = redisCommand(context, "RPUSH jobs %lld", job_num_id);
-     
+   assert(reply->type != REDIS_REPLY_ERROR);
+   
    return job_num_id;
 }
 
