@@ -14,10 +14,7 @@ Some examples:
   - Test cases for git (ie, testing git functionality)
   - Improving a component from a project using tests, making it reusable
   
-Kata Modifiers
---------------
-Katas can be decorated with 'modifiers' that put requirements on the solution,
-for example:
+Katas can be decorated with requirements, for example:
   - Max 10 lines of code
   - Max 10 kb memory
   - The code should be self-modifying
