@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <hiredis/hiredis.h>
 
 static void read_line(char *out, size_t n) {
@@ -15,6 +16,8 @@ static void read_line(char *out, size_t n) {
 
 static long long createJobId(redisContext *context) {
    redisReply *reply = redisCommand(context, "INCR jobs_last_id");
+   assert(reply->type == REDIS_REPLY_INTEGER);
+   
    if (reply->type == REDIS_REPLY_INTEGER) {
       printf("Got new id: %lld\n", reply->integer);
       return reply->integer;
@@ -41,7 +44,7 @@ int main() {
 
       char job_id[64] = {0};
       long long job_num_id = createJobId(context);
-      sprintf(job_id, "job:%lld", job_num_id);
+      snprintf(job_id, sizeof job_id - 1, "job:%lld", job_num_id);
       
       redisReply *reply = redisCommand(context, "HSET %s name %s", job_id, job_name);
       
