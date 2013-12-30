@@ -10,13 +10,13 @@ typedef struct {
    char *body;
 } job_t;
 
-static void read_input(char *output, char *data, size_t n) {
+static void readInput(char *output, char *data, size_t n) {
    printf("%s", output);
 
    char *buf = 0;
    size_t linecap = 0;
    if (!getline(&buf, &linecap, stdin)) {
-      exit(0);
+      exit(1);
    }
 
    strncpy(data, buf, n);
@@ -67,9 +67,9 @@ int main() {
       char job_city[256] = {0};
       char job_body[256] = {0};
       
-      read_input("name: ", job_name, sizeof job_name - 1);
-      read_input("city: ", job_city, sizeof job_city - 1);
-      read_input("body: ", job_body, sizeof job_body - 1);
+      readInput("name: ", job_name, sizeof job_name - 1);
+      readInput("city: ", job_city, sizeof job_city - 1);
+      readInput("body: ", job_body, sizeof job_body - 1);
 
       job_t job;
       job.name = job_name;
