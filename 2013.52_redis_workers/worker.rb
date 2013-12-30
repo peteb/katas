@@ -26,7 +26,7 @@ end
 
 # Returns fs path to generated file
 def generateMail(job)
-
+  'todo'
 end
 
 

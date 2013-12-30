@@ -13,6 +13,17 @@ static void read_line(char *out, size_t n) {
    strncpy(out, buf, n);
 }
 
+static long long createJobId(redisContext *context) {
+   redisReply *reply = redisCommand(context, "INCR jobs_last_id");
+   if (reply->type == REDIS_REPLY_INTEGER) {
+      printf("Got new id: %lld\n", reply->integer);
+      return reply->integer;
+   }   
+   
+   printf("Failed.\n");
+   exit(1);
+}
+
 int main() {
    printf("Welcome to Mail Generator Producer.\n");
 	
@@ -28,11 +39,16 @@ int main() {
       printf("name: ");
       read_line(job_name, sizeof job_name - 1);
 
-      redisReply *reply = redisCommand(context, "INCR jobs_last_id");
-      if (reply->type == REDIS_REPLY_INTEGER) {
-         printf("Got new id: %lld\n", reply->integer);
-      }
+      char job_id[64] = {0};
+      long long job_num_id = createJobId(context);
+      sprintf(job_id, "job:%lld", job_num_id);
+      
+      redisReply *reply = redisCommand(context, "HSET %s name %s", job_id, job_name);
+      
+      reply = redisCommand(context, "RPUSH jobs %lld", job_num_id);
    }
+   
+   redisFree(context);
    
    return 0;
 }
