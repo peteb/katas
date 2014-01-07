@@ -33,17 +33,34 @@ static const char *vertex_shader_code =
   "#version 150                \n"
   "in vec2 position;           \n"
   "in vec3 color;              \n"
+  "out vec3 frag_color;    \n"
   "void main() {               \n"
   "  gl_Position = vec4(position.x, position.y, 0.0, 1.0);   \n"
+  "  frag_color = color; \n"
   "}\n";
 
 static const char *fragment_shader_code =
   "#version 150                            \n"
-  " out vec4 color;                        \n"
+  "in vec3 frag_color;                     \n"
+  "out vec4 color;                         \n"
   "void main() {                           \n"
-  "  color = vec4(1.0, 0.0, 0.0, 1.0);     \n"
+  "  color = vec4(frag_color.rgb, 1.0);     \n"
   "}\n";
 
+static void mouse_clicked(GLFWwindow *window, int button, int action, int mods) {
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
+
+  double x, y;
+  glfwGetCursorPos(window, &x, &y);
+  x /= width;
+  y /= height;
+  
+  x = (x - 0.5) * 2;
+  y = (y - 0.5) * -2;
+  std::cout << "X: " << x << " Y: " << y << std::endl;
+  explode_at(x, y);
+}
 int main() {
   GLFWwindow *window;
 
@@ -54,13 +71,14 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+  
   window = glfwCreateWindow(1024, 768, "Fireworks!", nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     return 1;
   }
 
+  glfwSetMouseButtonCallback(window, mouse_clicked);
   glfwMakeContextCurrent(window);
   init_scene();
   
@@ -135,11 +153,14 @@ static GLuint create_program(const char *vshader, const char *fshader) {
 }
 
 static void update_sprites(float dt) {
+  // TODO: prune dead sprites
   for (sprite_t &sprite : sprites) {
-    sprite.vy -= 0.982 * dt;
+    sprite.vy -= 0.982 * dt + ((rand() % 100) - 50) / 7000.0f;
+    sprite.vx += ((rand() % 100) - 50) / 7000.0f;
     sprite.x += sprite.vx * dt;
     sprite.y += sprite.vy * dt;
     sprite.ttl -= dt;
+    sprite.radius += dt * 0.1;
   }
 }
 
@@ -149,52 +170,65 @@ static void push_color(std::vector<float> &out, float r, float g, float b) {
   out.push_back(b);
 }
 
+template<typename T>
+T clamp(T val) {
+  using std::max;
+  using std::min;
+  return max(min(val, T(1.0)), T(0.0));
+}
+
 static void render_sprites(std::vector<float> &out) {
   for (sprite_t &sprite : sprites) {
     float left = sprite.x - sprite.radius;
     float right = sprite.x + sprite.radius;
     float top = sprite.y - sprite.radius;
     float bottom = sprite.y + sprite.radius;
-    
+
+    float alpha = clamp(sprite.ttl);
     // tri #1
     out.push_back(left);
     out.push_back(top);
-    push_color(out, sprite.r, sprite.g, sprite.b);
+    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
     out.push_back(right);
     out.push_back(top);
-    push_color(out, sprite.r, sprite.g, sprite.b);
+    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
     out.push_back(right);
     out.push_back(bottom);
-    push_color(out, sprite.r, sprite.g, sprite.b);
+    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
     
     
     // tri #2
     out.push_back(right);
     out.push_back(bottom);
-    push_color(out, sprite.r, sprite.g, sprite.b);
+    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
     out.push_back(left);
     out.push_back(bottom);
-    push_color(out, sprite.r, sprite.g, sprite.b);
+    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
     out.push_back(left);
     out.push_back(top);
-    push_color(out, sprite.r, sprite.g, sprite.b);
+    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
   }
 }
 
 static void explode_at(float x, float y) {
   const int steps = 15;
+  float r = (rand() % 10) / 10.0f;
+  float g = (rand() % 10) / 10.0f;
+  float b = (rand() % 10) / 10.0f;
+  float ang_ofs = (rand() % 10) / 10.0f;
+  
   for (float ang = 0.0f; ang <= 2.0f * M_PI; ang += (2.0f * M_PI) / steps) {
     sprite_t sprite;
-    float speed = 0.6f;
-    sprite.vx = cos(ang) * speed;
-    sprite.vy = sin(ang) * speed;
+    float speed = 0.6f + (rand() % 10) / 200.0f;
+    sprite.vx = cos(ang + ang_ofs) * speed;
+    sprite.vy = sin(ang + ang_ofs) * speed;
     sprite.ttl = 2.0f;
-    sprite.r = 1.0f;
-    sprite.g = 0.0f;
-    sprite.b = 0.0f;
+    sprite.r = r;
+    sprite.g = g;
+    sprite.b = b;
     sprite.x = x;
     sprite.y = y;
-    sprite.radius = 0.1f;
+    sprite.radius = 0.001f;
     sprites.push_back(sprite);
   }
 }
