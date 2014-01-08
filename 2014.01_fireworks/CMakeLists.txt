@@ -9,11 +9,14 @@ if(APPLE)
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework Cocoa -framework QuartzCore -framework IOKit -framework OpenGL")
 endif()
 
-add_executable (Fireworks main.cc)
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
+add_executable (Fireworks main.cc gl.cc)
 target_link_libraries(Fireworks 
   ${LIBOPENGL_LIBRARIES} 
   ${GLFW_LIBRARY}
   ${COREFOUNDATION_LIBRARY}
 )
+
 include_directories(${LIBOPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR})
 

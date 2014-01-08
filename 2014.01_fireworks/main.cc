@@ -1,19 +1,51 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <memory>
 
-#include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
   
+#include "gl.h"
+#include "utils.h"
+
 static void draw_scene();
 static void init_scene();
 static void destroy_scene();
 static void update_sprites(float dt);
 static void render_sprites(std::vector<float> &out);
 static void explode_at(float x, float y);
+static void mouse_clicked(GLFWwindow *window, int button, int action, int mods);
 
-static GLuint create_shader(const char *code, GLenum type);
-static GLuint create_program(const char *vshader, const char *fshader);
+
+static void push_color(std::vector<float> &out, float r, float g, float b) {
+  out.push_back(r);
+  out.push_back(g);
+  out.push_back(b);
+}
+
+static void push_quad(std::vector<float> &buffer, float left, float top, float right, float bottom, float r, float g, float b) {
+  // tri #1
+  buffer.push_back(left);
+  buffer.push_back(top);
+  push_color(buffer, r, g, b);
+  buffer.push_back(right);
+  buffer.push_back(top);
+  push_color(buffer, r, g, b);
+  buffer.push_back(right);
+  buffer.push_back(bottom);
+  push_color(buffer, r, g, b);
+    
+  // tri #2
+  buffer.push_back(right);
+  buffer.push_back(bottom);
+  push_color(buffer, r, g, b);
+  buffer.push_back(left);
+  buffer.push_back(bottom);
+  push_color(buffer, r, g, b);
+  buffer.push_back(left);
+  buffer.push_back(top);
+  push_color(buffer, r, g, b);
+}
 
 struct sprite_t {
   float x, y;
@@ -21,6 +53,18 @@ struct sprite_t {
   float radius;
   float r, g, b;
   float ttl;
+  
+  void render(std::vector<float> &buffer) const {
+    float left = x - radius;
+    float right = x + radius;
+    float top = y - radius;
+    float bottom = y + radius;
+    float alpha = clamp(ttl);
+    
+    push_quad(buffer, left, top, right, bottom, r * alpha, g * alpha, b * alpha);
+  }
+  
+  static constexpr size_t rendered_data_size = 30 * sizeof(float);
 };
 
 GLuint vertices_buffer;
@@ -47,20 +91,6 @@ static const char *fragment_shader_code =
   "  color = vec4(frag_color.rgb, 1.0);     \n"
   "}\n";
 
-static void mouse_clicked(GLFWwindow *window, int button, int action, int mods) {
-  int width, height;
-  glfwGetWindowSize(window, &width, &height);
-
-  double x, y;
-  glfwGetCursorPos(window, &x, &y);
-  x /= width;
-  y /= height;
-  
-  x = (x - 0.5) * 2;
-  y = (y - 0.5) * -2;
-  std::cout << "X: " << x << " Y: " << y << std::endl;
-  explode_at(x, y);
-}
 int main() {
   GLFWwindow *window;
 
@@ -84,9 +114,7 @@ int main() {
   
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
-
     draw_scene();
-    
     glfwSwapBuffers(window);
   }
 
@@ -96,7 +124,8 @@ int main() {
 void init_scene() {
   glGenBuffers(1, &vertices_buffer);
   glGenVertexArrays(1, &vertices_vao);
-  shader_program = create_program(vertex_shader_code, fragment_shader_code);
+  shader_program = gl::create_program(vertex_shader_code, fragment_shader_code);
+  
   explode_at(0.0f, 0.0f);
 }
 
@@ -105,6 +134,7 @@ void draw_scene() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   update_sprites(1.0f/60.0f); // estimated 60 fps
+  
   std::vector<float> vertices;
   render_sprites(vertices);
   
@@ -123,94 +153,52 @@ void draw_scene() {
   glDrawArrays(GL_TRIANGLES, 0, vertices.size() / (2 + 3));
 }
 
+static void mouse_clicked(GLFWwindow *window, int button, int action, int mods) {
+  int width, height;
+  glfwGetWindowSize(window, &width, &height);
 
+  double x, y;
+  glfwGetCursorPos(window, &x, &y);
 
-static GLuint create_shader(const char *code, GLenum type) {
-  GLuint shader = glCreateShader(type);
-  glShaderSource(shader, 1, &code, nullptr);
-  glCompileShader(shader);
-  
-  GLint compile_status;
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
-  if (!compile_status) {
-    std::cerr << "Failed to compile shader." << std::endl;
-    exit(1);
-  }
-  
-  return shader;
-}
+  x = (x / width - 0.5) * 2;
+  y = (y / height - 0.5) * -2;
 
-static GLuint create_program(const char *vshader, const char *fshader) {
-  GLuint vertex_shader = create_shader(vshader, GL_VERTEX_SHADER);
-  GLuint fragment_shader = create_shader(fshader, GL_FRAGMENT_SHADER);
-  
-  GLuint program = glCreateProgram();
-  glAttachShader(program, vertex_shader);
-  glAttachShader(program, fragment_shader);  
-  glLinkProgram(program);
-  
-  return program;  
+  explode_at(x, y);
 }
 
 static void update_sprites(float dt) {
-  // TODO: prune dead sprites
-  for (sprite_t &sprite : sprites) {
-    sprite.vy -= 0.982 * dt + ((rand() % 100) - 50) / 7000.0f;
-    sprite.vx += ((rand() % 100) - 50) / 7000.0f;
-    sprite.x += sprite.vx * dt;
-    sprite.y += sprite.vy * dt;
-    sprite.ttl -= dt;
-    sprite.radius += dt * 0.1;
+  using std::begin;
+  using std::end;
+  using std::swap;
+  
+  // Use additive blending or something and the changing of order shouldn't be noticed
+  
+  for (auto iter = begin(sprites); iter != end(sprites); ) {
+    if (iter->ttl <= 0.0f) {
+      *iter = sprites.back();
+      sprites.pop_back();
+    }
+    else {
+      iter->vy -= 0.982 * dt + ((rand() % 100) - 50) / 7000.0f;
+      iter->vx += ((rand() % 100) - 50) / 7000.0f;
+      iter->x += iter->vx * dt;
+      iter->y += iter->vy * dt;
+      iter->ttl -= dt;
+      iter->radius += dt * 0.1;
+      ++iter;
+    }
   }
 }
 
-static void push_color(std::vector<float> &out, float r, float g, float b) {
-  out.push_back(r);
-  out.push_back(g);
-  out.push_back(b);
-}
-
-template<typename T>
-T clamp(T val) {
-  using std::max;
-  using std::min;
-  return max(min(val, T(1.0)), T(0.0));
-}
-
-static void render_sprites(std::vector<float> &out) {
+void render_sprites(std::vector<float> &out) {
+  out.reserve(sprite_t::rendered_data_size);
+  
   for (sprite_t &sprite : sprites) {
-    float left = sprite.x - sprite.radius;
-    float right = sprite.x + sprite.radius;
-    float top = sprite.y - sprite.radius;
-    float bottom = sprite.y + sprite.radius;
-
-    float alpha = clamp(sprite.ttl);
-    // tri #1
-    out.push_back(left);
-    out.push_back(top);
-    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
-    out.push_back(right);
-    out.push_back(top);
-    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
-    out.push_back(right);
-    out.push_back(bottom);
-    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
-    
-    
-    // tri #2
-    out.push_back(right);
-    out.push_back(bottom);
-    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
-    out.push_back(left);
-    out.push_back(bottom);
-    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
-    out.push_back(left);
-    out.push_back(top);
-    push_color(out, sprite.r * alpha, sprite.g * alpha, sprite.b * alpha);
+    sprite.render(out);
   }
 }
 
-static void explode_at(float x, float y) {
+void explode_at(float x, float y) {
   const int steps = 15;
   float r = (rand() % 10) / 10.0f;
   float g = (rand() % 10) / 10.0f;
