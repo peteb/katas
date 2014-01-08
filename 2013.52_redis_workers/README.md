@@ -6,8 +6,10 @@ read file path.
 
 Tech
 ----
-C (Server), Ruby (Workers), CMake, Redis, LaTeX/pdflatex (Generating PDF)
-XXXX (Testing server - worker integration)
+- C (Server)
+- Ruby (Workers)
+- CMake
+- Redis
 
 How to run
 ----------
