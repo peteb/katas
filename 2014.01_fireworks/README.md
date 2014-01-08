@@ -8,7 +8,7 @@ Tech
 - OpenGL
 - GLFW
 - CMake
-- 
+
 (SFML was decided against, problems with OpenGL 3.2 core there...)
 
 How to run
