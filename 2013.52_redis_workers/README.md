@@ -13,15 +13,21 @@ Tech
 
 How to run
 ----------
-First start redis; redis-server.
+First start redis (redis-server).
+Then start a worker or two:
 
+```shell
 ./worker.rb
+```
 or
+```shell
 god -c worker.god -D
+```
 
-cmake .
-./RedisMailGenerator
-
+Then build and run the producer:
+```shell
+cmake . && make && ./RedisMailGenerator
+```
 Notes
 -----
 PDF generating hasn't been implemented yet.
