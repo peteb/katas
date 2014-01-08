@@ -25,3 +25,5 @@ Notes
 PDF generating hasn't been implemented yet.
 Also skipped subscribing to jobs finished.
 No expiration on keys.
+
+![Screenshot](https://raw.github.com/peteb/katas/master/2013.52_redis_workers/screenshot.png)
