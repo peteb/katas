@@ -14,3 +14,5 @@ cmake . && make
 Notes
 -----
 I couldn't let this project slip without making it look a bit better.
+
+![ScreenShot](https://raw.github.com/peteb/katas/master/2014.01_fireworks/screenshot.png)
