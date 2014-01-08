@@ -4,10 +4,13 @@ Let the user launch some fireworks to celebrate the new year!
 
 Tech
 ----
-C++, OpenGL, SFML or GLFW, CMake
+C++, OpenGL, GLFW, CMake
+(SFML was decided against, problems with OpenGL 3.2 core there...)
 
 How to run
 ----------
+cmake . && make
 
 Notes
 -----
+I couldn't let this project slip without making it look a bit better.
