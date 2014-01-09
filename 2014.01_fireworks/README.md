@@ -19,8 +19,6 @@ cmake . && make
 
 Notes
 -----
-I couldn't let this project slip without making it look a bit better.
-
 I wanted to have textured particles but it took too much time; partly due to me not having worked with it for some years. I tried to use the CImg image loading library to load raw image data, but that was a failure. Turned out it didn't understand my jpg. The dependency on X11 and slow compilation time (everything's in one header file!) wasn't very good either. I would've tried DevIL if it wasn't for the gcc requirement. Agh, image loading is always a big mess.
 
 Screenshot
