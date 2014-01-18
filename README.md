@@ -4,12 +4,12 @@ Small projects for me to experiment with new and old technologies. One project p
 
 Technologies Used
 -----------------
-1 Ruby
-1 C
-1 Redis
-1 God
-2 CMake
-1 C++
-1 OpenGL
-1 GLFW
-
+- Ruby (2 times)
+- C (1 time)
+- Redis (2 times)
+- God (1 time)
+- CMake (2 times)
+- C++ (1 time)
+- OpenGL (1 time)
+- GLFW (1 time)
+- Sinatra (1 time)
