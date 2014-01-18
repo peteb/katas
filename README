@@ -1,33 +1,3 @@
 README
 ======
-My code katas. One per week, maximum 1 hour. Each kata should be 
-self-contained and built/tested through a makefile or similar.
-Tests should be written. TDD is a suggestion. All work is included in
-the 1 hour, excluding thinking up the problem. Write a README for the kata.
-If you run out of time, remove all work done and check in a text file describing
-why it took longer than you expected. Possibly try again another week with
-those problems avoided.
-
-Some examples:
-  - Implementing binary search in a new language
-  - A calculator in a language where you have previous experience
-  - Test cases for git (ie, testing git functionality)
-  - Improving a component from a project using tests, making it reusable
-  
-Katas can be decorated with requirements, for example:
-  - Max 10 lines of code
-  - Max 10 kb memory
-  - The code should be self-modifying
-  - Using CMake
-
-Examples
---------
-  - Compression using Huffman encoding
-  - Fast partial dictionary search (trie, for example)
-  - Extend the partial dictionary search for easy storage
-  - Indexing of file contents
-  - AVL tree
-  - Qsort
-  - Long multiplication using OpenCL
-  - A basic LISP-like
-  - Algorithms (from their Wikipedia definition)
+Small projects for me to experiment with new and old technologies. One project per week, maximum 1 hour.
