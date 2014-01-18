@@ -23,6 +23,7 @@ var operators = map[string]func(float64, float64) float64 {
   },
 }
 
+// Handles request to the arithmetic subsystem. Retrieves operators from the 'operators' variable.
 func ariHandler(r http.ResponseWriter, req *http.Request) {
   log.Printf("Got request: %#v", req.URL)
   query := req.URL.Query()
