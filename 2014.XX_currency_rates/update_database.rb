@@ -23,7 +23,7 @@ $app_id = 'f28059fea8524dcfa5c78853916f8258'
 # in JSON format.
 def retrieve_rates(date)
   path = "http://openexchangerates.org/api/historical/#{date.to_s}.json?app_id=#{$app_id}"
-  response = Net::HTTP.get_response(URI.parse(path))
+  response = Net::HTTP.get_response(URI.parse path)
   # TODO: error handling
   response.body
 end
@@ -40,9 +40,9 @@ end
 
 # Downloads and updates the Redis db with rates for the date
 def load_rates(date)
-  data = retrieve_rates(date)
-  rate_snapshot = JSON.parse(data)
-  exit 1 if rate_snapshot['base'].downcase != 'usd'  # TODO: better error handling
+  data = retrieve_rates date
+  rate_snapshot = JSON.parse data
+  exit 1 unless rate_snapshot['base'].downcase == 'usd'  # TODO: better error handling
 
   rate_date = DateTime.strptime(rate_snapshot['timestamp'].to_s, '%s').to_date
 
@@ -52,4 +52,4 @@ def load_rates(date)
 end
 
 
-load_rates(Date.today)
+load_rates Date.today
