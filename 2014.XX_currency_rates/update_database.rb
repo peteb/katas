@@ -16,6 +16,7 @@ require 'json'
 require 'redis'
 require 'date'
 require 'net/http'
+require 'bundler/setup'
 
 $app_id = 'f28059fea8524dcfa5c78853916f8258'
 

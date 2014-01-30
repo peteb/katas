@@ -1,0 +1,19 @@
+<h2>Messages</h2>
+
+<%= form_for :message do |f| %>
+<%= f.label :nickname %>
+<%= f.text_field :nickname %>
+<br />
+<%= f.label :message %>
+<%= f.text_area :message %>
+<br />
+<%= f.submit %>
+
+<% end %>
+
+<h3>Previous messages</h3>
+<% @messages.reverse.each do |message| %>
+<strong><%= message.nickname %></strong>: <%= message.message %>
+<%= link_to 'Delete', message_path(message), method: :delete %><br />
+
+<% end %>

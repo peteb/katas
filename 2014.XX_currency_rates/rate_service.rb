@@ -2,6 +2,7 @@
 
 require 'sinatra'
 require 'redis'
+require 'bundler/setup'
 
 # Retrieves the conversion rate between currency_a and currency_b
 # at the given date.
