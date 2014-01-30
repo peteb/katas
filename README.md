@@ -4,7 +4,7 @@ Small projects for me to experiment with new and old technologies. One project p
 
 Technologies Used
 -----------------
-- Ruby (2 times)
+- Ruby (3 times)
 - C (1 time)
 - Redis (2 times)
 - God (1 time)
@@ -13,3 +13,4 @@ Technologies Used
 - OpenGL (1 time)
 - GLFW (1 time)
 - Sinatra (1 time)
+- Rails (1 time)

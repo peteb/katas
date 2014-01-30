@@ -6,3 +6,9 @@ Tech
 ----
 - Ruby
 - Ruby on Rails
+
+How to run
+----------
+```shell
+rails server
+```
