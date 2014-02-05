@@ -21,10 +21,14 @@ read_message(Users) ->
       read_message(Users);
       
     {From, logout} ->
-      {Username, _} = lists:keyfind(From, 2, Users),
-      From ! {msg, "Good-bye, " ++ Username},
-      UsersLeft = lists:filter(fun({_, Pid}) -> Pid /= From end, Users),
-      read_message(UsersLeft);
+      case lists:keyfind(From, 2, Users) of       
+        {Username, _} ->
+          From ! {msg, "Good-bye, " ++ Username},
+          UsersLeft = lists:filter(fun({_, Pid}) -> Pid /= From end, Users),
+          read_message(UsersLeft);
+        _ ->
+          read_message(Users)
+      end;
       
     {'DOWN', _, _, DeadPid, _} ->
       UsersLeft = lists:filter(fun({_, Pid}) -> Pid /= DeadPid end, Users),
