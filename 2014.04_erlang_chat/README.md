@@ -8,3 +8,7 @@ Tech
 
 How to run
 ----------
+```shell
+erlc server.erl
+escript client.erl
+```
