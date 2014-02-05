@@ -14,3 +14,4 @@ Technologies Used
 - GLFW (1 time)
 - Sinatra (1 time)
 - Rails (1 time)
+- Erlang (1 time)
