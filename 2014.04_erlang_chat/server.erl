@@ -22,7 +22,7 @@ read_message(Users) ->
       
     {From, logout} ->
       {Username, _} = lists:keyfind(From, 2, Users),
-      From ! {msg, "Good-byeXXX, " ++ Username},
+      From ! {msg, "Good-bye, " ++ Username},
       UsersLeft = lists:filter(fun({_, Pid}) -> Pid /= From end, Users),
       read_message(UsersLeft);
       
