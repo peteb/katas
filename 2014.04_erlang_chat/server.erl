@@ -26,6 +26,7 @@ read_message(Users) ->
           From ! {msg, "Good-bye, " ++ Username},
           UsersLeft = lists:filter(fun({_, Pid}) -> Pid /= From end, Users),
           read_message(UsersLeft);
+          
         _ ->
           read_message(Users)
       end;
