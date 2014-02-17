@@ -1,0 +1,14 @@
+<form class="form-signin" role="form" action="session" method="POST">
+<h2 class="form-signin-heading">Inloggningsruta.</h2>
+
+<%--<c:if test="${not empty message}">
+<div class="alert alert-danger">${message}</div>
+</c:if> --%>
+
+<input name="email" type="text" class="form-control" placeholder="Emailadress" required autofocus>
+<input name="password" type="password" class="form-control" placeholder="Lösenord" required>
+<label class="checkbox">
+<input name="remember-me" type="checkbox" value="remember-me"> Kom ihåg mig
+</label>
+<button class="btn btn-lg btn-primary btn-block" type="submit">Logga in</button>
+</form>
